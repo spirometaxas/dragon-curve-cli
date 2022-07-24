@@ -1,0 +1,32 @@
+{
+  "name": "dragon-curve-cli",
+  "version": "1.0.0",
+  "description": "Print the Dragon Curve to the console!",
+  "main": "./src/index.js",
+  "bin": {
+    "dragon-curve-cli": "./src/cli.js"
+  },
+  "files": [
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spirometaxas/dragon-curve-cli.git"
+  },
+  "scripts": {
+    "cli": "node ./src/cli.js"
+  },
+  "author": "Spiro Metaxas",
+  "license": "MIT",
+  "keywords": [ 
+    "Dragon Curve",
+    "fractal",
+    "fractals", 
+    "dragon-curve-cli", 
+    "cli",
+    "console",
+    "terminal",
+    "shell",
+    "unicode" 
+  ]
+}
