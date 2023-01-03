@@ -1,3 +1,62 @@
+const LINES = {
+  '─': {
+    STANDARD: '─',
+    BOLD: '━',
+    DOUBLE: '═',
+  },
+  '│': {
+    STANDARD: '│',
+    BOLD: '┃',
+    DOUBLE: '║',
+  },
+  '┌': {
+    STANDARD: '┌',
+    BOLD: '┏',
+    DOUBLE: '╔',
+  },
+  '┐': {
+    STANDARD: '┐',
+    BOLD: '┓',
+    DOUBLE: '╗',
+  },
+  '┘': {
+    STANDARD: '┘',
+    BOLD: '┛',
+    DOUBLE: '╝',
+  },
+  '└': {
+    STANDARD: '└',
+    BOLD: '┗',
+    DOUBLE: '╚',
+  },
+  '┼': {
+    STANDARD: '┼',
+    BOLD: '╋',
+    DOUBLE: '╬',
+  },
+};
+
+const getLine = function(lineId, lineType) {
+  if (LINES[lineId] !== undefined && lineType !== undefined) {
+    return LINES[lineId][lineType.toUpperCase()];
+  } else if (LINES[lineId] !== undefined) {
+    return LINES[lineId].STANDARD;
+  } else {
+    return ' ';
+  }
+}
+
+const getLineType = function(line) {
+  if (line !== undefined && (line.toLowerCase() === 'standard' || line.toLowerCase() === 'double' || line.toLowerCase() === 'bold')) {
+    return line.toLowerCase();
+  }
+  return 'standard';
+}
+
+const isValidRotation = function(rotation) {
+  return rotation !== undefined && (rotation.toLowerCase() === 'left' || rotation.toLowerCase() === 'right' || rotation.toLowerCase() === 'flip' || rotation.toLowerCase() === 'standard');
+}
+
 const createBoard = function(w, h) {
   let board = [];
   for (let i = 0; i < h; i++) {
@@ -184,6 +243,19 @@ const getNextType = function(type) {
   return 'none';
 }
 
+const getNextInverseType = function(type) {
+  if (type === 'down') {
+    return 'right';
+  } else if (type === 'left') {
+    return 'down';
+  } else if (type === 'up') {
+    return 'left';
+  } else if (type === 'right') {
+    return 'up';
+  }
+  return 'none';
+}
+
 const getOppositeType = function(type) {
   if (type === 'down') {
     return 'up';
@@ -215,12 +287,12 @@ const addEndParams = function(queue) {
   }
 }
 
-const dragon = function(n, type) {
+const dragon = function(n, type, inverse=false) {
   let queue = [ type ];
   while (n > 0) {
     let nextQueue = [];
     for (let i = 0; i < queue.length; i++) {
-      nextQueue.push({ type: getNextType(queue[queue.length - i - 1].type) });
+      nextQueue.push({ type: inverse ? getNextInverseType(queue[queue.length - i - 1].type) : getNextType(queue[queue.length - i - 1].type) });
     }
     queue.push(...nextQueue);
     n--;
@@ -240,25 +312,38 @@ const dragon = function(n, type) {
   return board;
 }
 
-const draw = function(board) {
+const draw = function(board, lineType) {
   var result = '\n ';
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
-      result += board[board.length - i - 1][j];
+      result += getLine(board[board.length - i - 1][j], lineType);
     }
     result += '\n ';
   }
   return result;
 }
 
-const create = function(n) {
+const create = function(n, config) {
   if (n === undefined || isNaN(n) || n < 0) {
     return '';
   }
 
-  const board = dragon(n, { type: 'down'});
+  const inverse = config !== undefined && config.inverse === true;
+  const rotate = config !== undefined && isValidRotation(config.rotate) ? config.rotate.toLowerCase() : 'standard';
+  const lineType = config !== undefined ? getLineType(config.line) : undefined;
+
+  let board;
+  if (rotate === 'left') {
+    board = dragon(n, { type: 'right'}, inverse);
+  } else if (rotate === 'right') {
+    board = dragon(n, { type: 'left'}, inverse);
+  } else if (rotate === 'flip') {
+    board = dragon(n, { type: 'up'}, inverse);
+  } else {
+    board = dragon(n, { type: 'down'}, inverse);
+  }
   
-  return draw(board);
+  return draw(board, lineType);
 }
 
 module.exports = {
